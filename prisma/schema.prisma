@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                        String    @id @default(uuid())
+  customerId                String    @map("customer_id")
+  customerName              String    @map("customer_name")
+  stakeholderName           String    @map("stakeholder_name")
+  stakeholderRole           String    @map("stakeholder_role")
+  status                    String    @default("READY") // INTEL_GATHERING | PREMEET_SENT | READY | IN_PROGRESS | PAUSED | COMPLETE
+  currentSection            String    @default("1") @map("current_section") // 0A | 0B | 1 | 2 | 3 | 4 | 5
+  sectionStatus             String    @default("{}") @map("section_status") // JSON
+  contourMap                String    @default("{}") @map("contour_map") // JSON
+  intelBrief                String?   @map("intel_brief") // JSON
+  premeetArtifactsReceived  String    @default("[]") @map("premeet_artifacts_received") // JSON array
+  messages                  Message[]
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime  @updatedAt @map("updated_at")
+
+  @@map("sessions")
+}
+
+model Message {
+  id                String   @id @default(uuid())
+  sessionId         String   @map("session_id")
+  session           Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role              String   // AGENT | STAKEHOLDER | SYSTEM
+  content           String
+  richContent       String?  @map("rich_content") // JSON
+  files             String?  // JSON
+  section           String
+  confidenceUpdates String?  @map("confidence_updates") // JSON
+  timestamp         DateTime @default(now())
+
+  @@index([sessionId])
+  @@map("messages")
+}
