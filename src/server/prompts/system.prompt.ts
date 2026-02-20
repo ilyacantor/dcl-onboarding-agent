@@ -1,5 +1,7 @@
 import type { SectionId } from '../types/session.types.js';
 import type { ContourMap } from '../types/contour.types.js';
+import { getSection0APrompt } from './section-0a.prompt.js';
+import { getSection0BPrompt } from './section-0b.prompt.js';
 import { getSection1Prompt } from './section-1.prompt.js';
 import { getSection2Prompt } from './section-2.prompt.js';
 import { getSection3Prompt } from './section-3.prompt.js';
@@ -78,6 +80,8 @@ function buildContextLayer(ctx: SessionContext): string {
 // ── Layer 3: Section-specific prompt ────────────────────────────────
 function getSectionPrompt(section: SectionId, contourMap: ContourMap): string {
   switch (section) {
+    case '0A': return getSection0APrompt(contourMap);
+    case '0B': return getSection0BPrompt(contourMap);
     case '1': return getSection1Prompt(contourMap);
     case '2': return getSection2Prompt(contourMap);
     case '3': return getSection3Prompt(contourMap);

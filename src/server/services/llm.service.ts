@@ -175,6 +175,50 @@ const TOOLS: Tool[] = [
       required: ['summary'],
     },
   },
+  {
+    name: 'process_file',
+    description:
+      'Process an uploaded file to extract structured data. Use when a stakeholder uploads a file and you need to analyze its contents.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        file_id: {
+          type: 'string',
+          description: 'The ID of the uploaded file to process',
+        },
+        analysis_focus: {
+          type: 'string',
+          description:
+            'Optional focus area for analysis (e.g., "organizational hierarchy", "cost centers", "system mappings")',
+        },
+      },
+      required: ['file_id'],
+    },
+  },
+  {
+    name: 'lookup_system_data',
+    description:
+      'Query AOD/AAM/DCL APIs for specific data about the customer\'s systems, connections, or existing graph. Use when you need to cross-reference what the stakeholder says with discovered system data.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        query_type: {
+          type: 'string',
+          enum: ['systems', 'connections', 'dimension_data', 'graph_summary'],
+          description: 'What type of data to look up',
+        },
+        system_name: {
+          type: 'string',
+          description: 'Optional system name to filter by',
+        },
+        dimension: {
+          type: 'string',
+          description: 'Optional dimension name for dimension_data queries',
+        },
+      },
+      required: ['query_type'],
+    },
+  },
 ];
 
 // ── Message type for conversation history ───────────────────────────

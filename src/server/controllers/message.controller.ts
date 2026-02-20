@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
 import { prisma } from '../db/client.js';
-import { handleStakeholderMessage } from '../services/conversation.service.js';
+import { handleStakeholderMessage, type FileInput } from '../services/conversation.service.js';
 
 function paramId(req: Request): string {
   const id = req.params.id;
@@ -31,7 +32,19 @@ export async function sendMessage(req: Request, res: Response) {
       return;
     }
 
-    const result = await handleStakeholderMessage(session, content);
+    // Process uploaded files from multer
+    let files: FileInput[] | undefined;
+    const multerFiles = (req as any).files as Express.Multer.File[] | undefined;
+    if (multerFiles && multerFiles.length > 0) {
+      files = multerFiles.map((f) => ({
+        id: uuid(),
+        filename: f.originalname,
+        mime_type: f.mimetype,
+        buffer: f.buffer,
+      }));
+    }
+
+    const result = await handleStakeholderMessage(session, content, files);
 
     res.json(result);
   } catch (err) {
@@ -56,6 +69,7 @@ export async function getMessages(req: Request, res: Response) {
         role: m.role,
         content: m.content,
         rich_content: m.richContent ? JSON.parse(m.richContent) : null,
+        files: m.files ? JSON.parse(m.files) : null,
         section: m.section,
         timestamp: m.timestamp,
       })),

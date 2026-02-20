@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server/index.ts",
+    "dev:client": "vite",
     "build": "tsc",
+    "build:client": "vite build",
     "start": "node dist/server/index.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -16,22 +18,37 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@prisma/client": "^6.3.0",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.1",
+    "pdf-parse": "^2.4.5",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "uuid": "^11.0.5",
     "ws": "^8.18.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.13.4",
+    "@types/nodemailer": "^7.0.10",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.14",
+    "@vitejs/plugin-react": "^5.1.4",
     "prisma": "^6.3.0",
+    "tailwindcss": "^4.2.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^7.3.1"
   },
   "engines": {
     "node": ">=20.0.0"

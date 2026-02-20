@@ -7,6 +7,7 @@ import type {
   VocabularyEntry,
   PriorityQuery,
   FollowUpTask,
+  UploadedArtifact,
   Provenance,
 } from '../types/contour.types.js';
 import type { ToolCall } from './llm.service.js';
@@ -43,6 +44,23 @@ export function processToolCall(
         displayContent: null,
         stateAction: { type: 'ADVANCE', summary: toolCall.input.summary },
       };
+    case 'process_file': {
+      // File processing is handled by conversation.service before reaching here.
+      // If it does arrive here, return a message indicating the file was already processed.
+      const fileId = toolCall.input.file_id as string;
+      const artifact = map.uploaded_artifacts.find((a) => a.id === fileId);
+      if (artifact) {
+        return {
+          contourMap: map,
+          displayContent: null,
+          stateAction: null,
+        };
+      }
+      return { contourMap: map, displayContent: null, stateAction: null };
+    }
+    case 'lookup_system_data':
+      // Handled by conversation.service which calls the API clients directly
+      return { contourMap: map, displayContent: null, stateAction: null };
     default:
       return { contourMap: map, displayContent: null, stateAction: null };
   }
@@ -237,6 +255,18 @@ function findNode(tree: HierarchyNode[], id: string): HierarchyNode | null {
     if (found) return found;
   }
   return null;
+}
+
+// ── Artifact helpers ────────────────────────────────────────────────
+
+export function addArtifact(
+  contourMap: ContourMap,
+  artifact: UploadedArtifact,
+): ContourMap {
+  const map = structuredClone(contourMap);
+  map.uploaded_artifacts.push(artifact);
+  map.metadata.last_updated = new Date().toISOString();
+  return map;
 }
 
 // ── Completeness scoring ────────────────────────────────────────────

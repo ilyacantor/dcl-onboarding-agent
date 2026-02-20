@@ -1,7 +1,8 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
+import { v4 as uuid } from 'uuid';
 import { prisma } from './db/client.js';
-import { handleStakeholderMessage } from './services/conversation.service.js';
+import { handleStakeholderMessage, type FileInput } from './services/conversation.service.js';
 
 export function setupWebSocket(server: Server): void {
   const wss = new WebSocketServer({ server, path: '/ws' });
@@ -35,7 +36,24 @@ export function setupWebSocket(server: Server): void {
             return;
           }
 
-          const result = await handleStakeholderMessage(session, message.content);
+          // Process base64-encoded file attachments if present
+          let files: FileInput[] | undefined;
+          if (message.files && Array.isArray(message.files)) {
+            files = message.files.map(
+              (f: { filename: string; mime_type: string; data: string }) => ({
+                id: uuid(),
+                filename: f.filename,
+                mime_type: f.mime_type,
+                buffer: Buffer.from(f.data, 'base64'),
+              }),
+            );
+          }
+
+          const result = await handleStakeholderMessage(
+            session,
+            message.content,
+            files,
+          );
 
           ws.send(
             JSON.stringify({
